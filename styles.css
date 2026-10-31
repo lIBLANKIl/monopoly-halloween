@@ -1,0 +1,946 @@
+/* ===== Juru Marble — Halloween Theme ===== */
+:root {
+  --bg-0: oklch(0.14 0.02 300);
+  --bg-1: oklch(0.18 0.025 300);
+  --bg-2: oklch(0.22 0.03 300);
+  --bg-3: oklch(0.26 0.035 300);
+  --line: oklch(0.34 0.04 300);
+  --line-soft: oklch(0.28 0.035 300);
+  --ink: oklch(0.96 0.01 300);
+  --ink-dim: oklch(0.72 0.02 300);
+  --ink-mute: oklch(0.52 0.025 300);
+
+  --neon-pink: oklch(0.75 0.19 55);
+  --neon-cyan: oklch(0.85 0.17 165);
+  --neon-yellow: oklch(0.9 0.18 95);
+  --neon-violet: oklch(0.62 0.23 305);
+  --neon-lime: oklch(0.88 0.2 135);
+  --neon-orange: oklch(0.62 0.22 28);
+
+  --shadow-glow-pink: 0 0 12px oklch(0.75 0.19 55 / 0.6), 0 0 32px oklch(0.75 0.19 55 / 0.25);
+  --shadow-glow-cyan: 0 0 12px oklch(0.85 0.17 165 / 0.6), 0 0 32px oklch(0.85 0.17 165 / 0.25);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-0);
+  color: var(--ink);
+  font-family: 'Pretendard', 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    radial-gradient(900px 600px at 15% -5%, oklch(0.32 0.13 55 / 0.18), transparent 60%),
+    radial-gradient(900px 700px at 95% 105%, oklch(0.32 0.12 300 / 0.18), transparent 60%),
+    var(--bg-0);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(oklch(1 0 0 / 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.015) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== Layout ===== */
+.app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin: 0;
+  padding: 16px 20px 40px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0 20px;
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: 24px;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-mark {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-violet));
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-glow-pink);
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 24px;
+  color: oklch(0.12 0.02 300);
+}
+.brand-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.brand-title .accent { color: var(--neon-pink); text-shadow: var(--shadow-glow-pink); }
+.brand-sub {
+  font-size: 11px;
+  color: var(--ink-mute);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.mode-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+}
+.mode-tab {
+  appearance: none; border: 0; cursor: pointer;
+  background: transparent;
+  color: var(--ink-dim);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 9px;
+  letter-spacing: 0.04em;
+  transition: all 160ms ease;
+}
+.mode-tab:hover { color: var(--ink); }
+.mode-tab.active {
+  background: var(--bg-3);
+  color: var(--neon-cyan);
+  box-shadow: inset 0 0 0 1px var(--line), 0 0 16px oklch(0.85 0.17 165 / 0.15);
+}
+
+/* ===== Board (single column, full width) ===== */
+.board-wrap {
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 24px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  /* fit the whole board in one screen: viewport height minus the top bar */
+  max-width: min(max(560px, calc(100vh - 150px)), 1180px);
+  margin: 0 auto;
+}
+
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1 / 1;
+  gap: 8px;
+}
+
+/* ===== Cells ===== */
+.cell {
+  position: relative;
+  background: var(--bg-2);
+  border: 2px solid oklch(0.42 0.04 300);
+  border-radius: 12px;
+  padding: 14px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.04);
+}
+.cell:hover {
+  border-color: var(--neon-cyan);
+  background: var(--bg-3);
+  transform: translateY(-1px);
+}
+.cell.is-active {
+  border-color: var(--neon-pink);
+  box-shadow: var(--shadow-glow-pink), inset 0 0 0 1px var(--neon-pink);
+  background: oklch(0.25 0.06 55);
+}
+.cell.shuffling {
+  animation: cellShuffle 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes cellShuffle {
+  0%   { transform: scale(1) rotate(0deg); filter: brightness(1); }
+  30%  { transform: scale(0.85) rotate(-8deg); filter: brightness(1.6) hue-rotate(40deg); }
+  60%  { transform: scale(1.08) rotate(6deg); filter: brightness(1.4) hue-rotate(-30deg); }
+  100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+}
+
+.cell-idx {
+  position: absolute;
+  top: 6px; left: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-mute);
+  letter-spacing: 0.05em;
+}
+.cell-label {
+  font-family: 'Black Han Sans', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  word-break: keep-all;
+}
+.cell-sub {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 6px;
+  font-weight: 500;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+/* corners — slightly larger emphasis */
+.cell.corner .cell-label { font-size: 22px; }
+
+.cell.kind-start {
+  background: linear-gradient(160deg, oklch(0.28 0.12 135 / 0.6), var(--bg-3));
+  border-color: var(--neon-lime);
+  box-shadow: inset 0 0 24px oklch(0.88 0.2 135 / 0.15);
+}
+.cell.kind-rest {
+  background: linear-gradient(160deg, oklch(0.28 0.1 165 / 0.6), var(--bg-3));
+  border-color: var(--neon-cyan);
+  box-shadow: inset 0 0 24px oklch(0.85 0.17 165 / 0.15);
+}
+.cell.kind-bomb {
+  background: linear-gradient(160deg, oklch(0.28 0.14 28 / 0.6), var(--bg-3));
+  border-color: var(--neon-orange);
+  box-shadow: inset 0 0 24px oklch(0.62 0.22 28 / 0.18);
+}
+.cell.kind-anywhere {
+  background: linear-gradient(160deg, oklch(0.28 0.12 305 / 0.6), var(--bg-3));
+  border-color: var(--neon-violet);
+  box-shadow: inset 0 0 24px oklch(0.62 0.23 305 / 0.18);
+}
+
+/* token (the ONE piece) — horse emoji on a glowing platter */
+.cell-tokens {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 3;
+}
+.token-piece {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 25%, oklch(0.98 0.005 300 / 0.95), oklch(0.78 0.17 55 / 0.85) 55%, oklch(0.45 0.17 45 / 0.9) 100%);
+  border: 2.5px solid oklch(0.12 0.02 300);
+  box-shadow:
+    0 0 0 2px var(--neon-pink),
+    0 0 26px oklch(0.75 0.19 55 / 0.75),
+    0 10px 18px oklch(0 0 0 / 0.55);
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  line-height: 1;
+  /* Make the emoji pop with a soft drop shadow */
+  filter: drop-shadow(0 2px 3px oklch(0 0 0 / 0.5));
+  animation: tokenPulse 1.6s ease-in-out infinite;
+}
+@keyframes tokenPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 2px var(--neon-pink), 0 0 22px oklch(0.75 0.19 55 / 0.7), 0 10px 18px oklch(0 0 0 / 0.55); }
+  50%      { transform: scale(1.06); box-shadow: 0 0 0 2px var(--neon-pink), 0 0 36px oklch(0.75 0.19 55 / 0.95), 0 12px 22px oklch(0 0 0 / 0.55); }
+}
+.token-piece.bouncing {
+  animation: tokenBounce 240ms ease;
+}
+@keyframes tokenBounce {
+  0%   { transform: scale(1) translateY(0) rotate(0deg); }
+  40%  { transform: scale(1.18) translateY(-14px) rotate(-12deg); }
+  70%  { transform: scale(1.05) translateY(-4px)  rotate(6deg); }
+  100% { transform: scale(1) translateY(0) rotate(0deg); }
+}
+
+/* ===== Center hub — fills entire 6x6 inner area of 8x8 grid ===== */
+.center-hub {
+  grid-column: 2 / 8;
+  grid-row: 2 / 8;
+  background:
+    radial-gradient(circle at 50% 30%, oklch(0.28 0.09 55 / 0.5), transparent 65%),
+    var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+.center-hub::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed var(--line-soft);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.hub-title {
+  text-align: center;
+  font-family: 'Black Han Sans', sans-serif;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+}
+.hub-title .row1 {
+  font-size: 13px;
+  color: var(--neon-cyan);
+  text-shadow: var(--shadow-glow-cyan);
+}
+.hub-title .row2 {
+  font-size: 44px;
+  color: var(--neon-pink);
+  text-shadow: var(--shadow-glow-pink);
+  margin-top: 4px;
+}
+
+/* ===== 3D Dice ===== */
+.dice-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.dice-stage {
+  --die: 136px;
+  width: var(--die);
+  height: var(--die);
+  perspective: 700px;
+  perspective-origin: 50% 30%;
+  position: relative;
+}
+.dice-3d {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  /* Short transition so the cube snaps cleanly to the rolled face after the
+     animation. Long transitions reverse-spin through many turns and look weird. */
+  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+.dice-3d.rolling {
+  animation: diceRoll3D 1.4s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+}
+/* Simpler, cleaner motion: 2-axis spin + a single up-down hop.
+   Ends visually at 0/0 (1800° = 5 turns, 1440° = 4 turns) so the
+   transition to land-N is just a small final orientation. */
+@keyframes diceRoll3D {
+  0%   { transform: translateY(0)     rotateX(0deg)    rotateY(0deg); }
+  22%  { transform: translateY(-46px) rotateX(540deg)  rotateY(360deg); }
+  50%  { transform: translateY(-18px) rotateX(1080deg) rotateY(900deg); }
+  78%  { transform: translateY(-32px) rotateX(1500deg) rotateY(1200deg); }
+  92%  { transform: translateY(-6px)  rotateX(1740deg) rotateY(1380deg); }
+  100% { transform: translateY(0)     rotateX(1800deg) rotateY(1440deg); }
+}
+.dice-face {
+  position: absolute;
+  inset: 0;
+  /* nicer ivory + subtle bevel */
+  background:
+    linear-gradient(160deg, oklch(0.99 0.004 95) 0%, oklch(0.94 0.01 95) 60%, oklch(0.82 0.015 95) 100%);
+  border: 2px solid oklch(0.65 0.02 300);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 0 0 1px oklch(1 0 0 / 0.45),
+    inset 0 -6px 0 oklch(0.6 0.02 300 / 0.3),
+    inset 0 8px 16px oklch(1 0 0 / 0.25);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  padding: 17px;
+  gap: 6px;
+  backface-visibility: hidden;
+}
+.dice-pip {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, oklch(0.45 0.05 300), oklch(0.14 0.02 300));
+  box-shadow:
+    inset 0 1px 2px oklch(0 0 0 / 0.55),
+    inset 0 -1px 1px oklch(1 0 0 / 0.15);
+  align-self: center;
+  justify-self: center;
+}
+
+/* ----- Standard western die: opposite faces sum to 7 -----
+   Placement (cube half = 48px):
+     face-1 → FRONT       (opposite face-6 BACK,   1+6=7)
+     face-2 → TOP         (opposite face-5 BOTTOM, 2+5=7)
+     face-3 → LEFT        (opposite face-4 RIGHT,  3+4=7)
+*/
+.dice-face.face-1 { transform: translateZ(calc(var(--die) / 2)); }                    /* front */
+.dice-face.face-6 { transform: rotateY(180deg) translateZ(calc(var(--die) / 2)); }    /* back */
+.dice-face.face-3 { transform: rotateY(90deg)  translateZ(calc(var(--die) / 2)); }    /* left  */
+.dice-face.face-4 { transform: rotateY(-90deg) translateZ(calc(var(--die) / 2)); }    /* right */
+.dice-face.face-5 { transform: rotateX(90deg)  translateZ(calc(var(--die) / 2)); }    /* bottom */
+.dice-face.face-2 { transform: rotateX(-90deg) translateZ(calc(var(--die) / 2)); }    /* top */
+
+/* Rotations that bring each face to the front of the cube */
+.dice-3d.land-1 { transform: rotateX(0deg)   rotateY(0deg); }
+.dice-3d.land-2 { transform: rotateX(90deg)  rotateY(0deg); }    /* top    → front */
+.dice-3d.land-3 { transform: rotateX(0deg)   rotateY(-90deg); } /* left   → front */
+.dice-3d.land-4 { transform: rotateX(0deg)   rotateY(90deg); }  /* right  → front */
+.dice-3d.land-5 { transform: rotateX(-90deg) rotateY(0deg); }   /* bottom → front */
+.dice-3d.land-6 { transform: rotateX(0deg)   rotateY(180deg); } /* back   → front */
+
+/* dice shadow on the "floor" — shrinks while in the air */
+.dice-shadow {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  width: 112px; height: 18px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, oklch(0 0 0 / 0.6), transparent 70%);
+  filter: blur(3px);
+  transition: width 0.4s ease, opacity 0.4s ease;
+}
+.dice-shadow.rolling {
+  animation: shadowPulse 1.4s cubic-bezier(0.18, 0.7, 0.2, 1) forwards;
+}
+@keyframes shadowPulse {
+  0%   { width: 112px; opacity: 0.7; filter: blur(3px); }
+  20%  { width: 50px; opacity: 0.3; filter: blur(7px); }
+  50%  { width: 70px; opacity: 0.4; filter: blur(6px); }
+  80%  { width: 84px; opacity: 0.55; filter: blur(4px); }
+  100% { width: 112px; opacity: 0.7; filter: blur(3px); }
+}
+
+/* Visible value badge — confirms randomness during the spin */
+.dice-value-badge {
+  font-family: 'Black Han Sans', 'JetBrains Mono', sans-serif;
+  font-size: 30px;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 10px oklch(0.9 0.18 95 / 0.8), 0 0 22px oklch(0.9 0.18 95 / 0.35);
+  min-width: 60px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: oklch(0.18 0.02 300 / 0.7);
+  border: 1px solid oklch(0.9 0.18 95 / 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  margin-top: 14px;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.dice-value-badge.is-rolling {
+  color: var(--neon-cyan);
+  border-color: oklch(0.85 0.17 165 / 0.6);
+  text-shadow: 0 0 10px var(--neon-cyan), 0 0 22px oklch(0.85 0.17 165 / 0.5);
+  animation: valueFlicker 70ms steps(1) infinite;
+}
+@keyframes valueFlicker {
+  0%   { transform: scale(1)     skewX(0deg); }
+  50%  { transform: scale(1.06) skewX(-3deg); }
+  100% { transform: scale(1)     skewX(0deg); }
+}
+.dice-value-num { display: inline-block; }
+
+.btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 12px;
+  padding: 13px 24px;
+  font-size: 13px;
+  transition: all 140ms ease;
+}
+.btn-primary.btn-roll {
+  font-size: 20px;
+  padding: 18px 48px;
+  border-radius: 16px;
+  letter-spacing: 0.06em;
+}
+.btn-primary {
+  background: var(--neon-pink);
+  color: oklch(0.12 0.02 300);
+  box-shadow: var(--shadow-glow-pink);
+}
+.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn-primary:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.btn-ghost:hover { color: var(--ink); border-color: var(--neon-cyan); }
+
+.hub-status {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 22px;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  text-align: center;
+  min-height: 30px;
+  word-break: keep-all;
+}
+.hub-status.is-ghost {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan), 0 0 28px oklch(0.85 0.17 165 / 0.5);
+  animation: ghostMsgIn 400ms ease-out;
+}
+@keyframes ghostMsgIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ===== Mission Modal ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: oklch(0 0 0 / 0.7);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  animation: fadeIn 220ms ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  width: min(560px, 92vw);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 30px 80px oklch(0 0 0 / 0.6), 0 0 60px oklch(0.75 0.19 55 / 0.2);
+  animation: modalIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes modalIn {
+  from { transform: scale(0.92) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  margin-bottom: 12px;
+}
+.modal-headline {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 40px;
+  line-height: 1.05;
+  margin: 0 0 8px;
+  color: var(--neon-pink);
+  text-shadow: var(--shadow-glow-pink);
+  letter-spacing: 0.01em;
+}
+.modal-body {
+  font-size: 14px;
+  color: var(--ink-dim);
+  line-height: 1.55;
+  margin: 12px 0 24px;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Shuffle announcement modal */
+.modal-shuffle {
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 30px 80px oklch(0 0 0 / 0.6),
+    0 0 80px oklch(0.85 0.17 165 / 0.35),
+    0 0 0 1px oklch(0.85 0.17 165 / 0.4);
+  animation: modalIn 280ms cubic-bezier(0.2, 0.9, 0.3, 1.2),
+             shufflePulse 1.4s ease-in-out 0.3s infinite;
+}
+.modal-shuffle .modal-headline {
+  color: var(--neon-cyan);
+  text-shadow:
+    0 0 14px oklch(0.85 0.17 165 / 0.8),
+    0 0 36px oklch(0.85 0.17 165 / 0.5);
+}
+.modal-shuffle .modal-eyebrow {
+  letter-spacing: 0.4em;
+  font-size: 11px;
+}
+@keyframes shufflePulse {
+  0%, 100% { box-shadow: 0 30px 80px oklch(0 0 0 / 0.6), 0 0 80px oklch(0.85 0.17 165 / 0.35), 0 0 0 1px oklch(0.85 0.17 165 / 0.4); }
+  50%      { box-shadow: 0 30px 80px oklch(0 0 0 / 0.6), 0 0 110px oklch(0.85 0.17 165 / 0.55), 0 0 0 1.5px oklch(0.85 0.17 165 / 0.6); }
+}
+
+/* Roulette */
+.roulette {
+  height: 64px;
+  margin: 18px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+}
+.roulette-track {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 24px;
+  padding: 0 30px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.roulette-item {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 18px;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+.roulette-marker {
+  position: absolute;
+  top: 0; bottom: 0; left: 50%;
+  width: 2px;
+  background: var(--neon-yellow);
+  box-shadow: 0 0 12px var(--neon-yellow);
+  transform: translateX(-50%);
+}
+.roulette-marker::before, .roulette-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  transform: translateX(-50%);
+}
+.roulette-marker::before { top: 0; border-top: 8px solid var(--neon-yellow); }
+.roulette-marker::after { bottom: 0; border-bottom: 8px solid var(--neon-yellow); }
+
+/* ===== Edit mode ===== */
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.edit-cell {
+  background: var(--bg-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.edit-cell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.edit-cell-idx {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-mute);
+  letter-spacing: 0.1em;
+}
+.edit-kind-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: var(--bg-3);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.edit-input, .edit-textarea {
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 140ms ease;
+}
+.edit-input:focus, .edit-textarea:focus { border-color: var(--neon-cyan); }
+.edit-textarea {
+  font-weight: 500;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 56px;
+  color: var(--ink-dim);
+}
+
+.edit-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+}
+.edit-toolbar-info {
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+.edit-toolbar-info b { color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-2);
+  border: 1px solid var(--neon-cyan);
+  color: var(--ink);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 200;
+  box-shadow: 0 0 24px oklch(0.85 0.17 165 / 0.3);
+  animation: toastIn 260ms ease;
+}
+@keyframes toastIn {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-1); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+
+/* ===== Halloween decorations ===== */
+body::after {
+  content: "🦇   🕸️   🦇        🦇   👻   🦇";
+  position: fixed;
+  top: 6px; left: 0; right: 0;
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 0.6em;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+  animation: batsDrift 9s ease-in-out infinite alternate;
+}
+@keyframes batsDrift {
+  from { transform: translateX(-24px); }
+  to   { transform: translateX(24px); }
+}
+
+.board-wrap {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 40px oklch(0.75 0.19 55 / 0.18), inset 0 0 60px oklch(0.62 0.23 305 / 0.12);
+}
+.board-wrap::before,
+.board-wrap::after {
+  position: absolute;
+  font-size: 44px;
+  line-height: 1;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 4;
+}
+.board-wrap::before { content: "🕸️"; top: 2px; left: 4px; }
+.board-wrap::after  { content: "🕸️"; bottom: 2px; right: 4px; transform: scaleX(-1) scaleY(-1); }
+
+.cell { border-color: oklch(0.42 0.06 300); }
+.cell:hover { border-color: var(--neon-pink); }
+.cell.kind-start::after,
+.cell.kind-bomb::after,
+.cell.kind-rest::after,
+.cell.kind-anywhere::after {
+  position: absolute;
+  right: 6px; bottom: 4px;
+  font-size: 18px;
+  opacity: 0.8;
+}
+.cell.kind-start::after    { content: "🎃"; }
+.cell.kind-bomb::after     { content: "💀"; }
+.cell.kind-rest::after     { content: "👻"; }
+.cell.kind-anywhere::after { content: "🧙"; }
+
+.center-hub {
+  background:
+    radial-gradient(circle at 50% 30%, oklch(0.32 0.1 55 / 0.45), transparent 65%),
+    radial-gradient(circle at 50% 110%, oklch(0.3 0.14 305 / 0.5), transparent 60%),
+    var(--bg-1);
+}
+.brand-mark { font-size: 26px; }
+.hub-title .row2::before { content: "🎃 "; font-size: 0.6em; }
+.hub-title .row2::after  { content: " 🦇"; font-size: 0.6em; }
+
+/* ===== Ghost haunts the die ===== */
+.dice-ghost {
+  position: absolute;
+  top: 50%; left: 50%;
+  font-size: 64px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 0 14px oklch(0.95 0.05 165 / 0.9));
+  animation: ghostSwoop 2.2s ease-in-out forwards;
+}
+@keyframes ghostSwoop {
+  0%   { transform: translate(260%, -170%) scale(0.6) rotate(12deg); opacity: 0; }
+  25%  { transform: translate(-50%, -60%) scale(1.25) rotate(-8deg); opacity: 0.95; }
+  40%  { transform: translate(-50%, -50%) scale(1.5) rotate(8deg); opacity: 0.9; }
+  55%  { transform: translate(-50%, -50%) scale(1.5) rotate(-8deg); opacity: 0.9; }
+  100% { transform: translate(-320%, -230%) scale(0.7) rotate(-14deg); opacity: 0; }
+}
+.dice-area.haunted .dice-stage {
+  animation: diceHaunt 2.2s ease-in-out;
+}
+@keyframes diceHaunt {
+  0%, 20% { transform: translate(0, 0) rotateZ(0); filter: none; }
+  30%, 55% { transform: translate(0, 0); filter: hue-rotate(120deg) brightness(1.5) drop-shadow(0 0 12px var(--neon-cyan)); }
+  35% { transform: translateX(-5px) rotateZ(-6deg); }
+  40% { transform: translateX(5px)  rotateZ(6deg); }
+  45% { transform: translateX(-5px) rotateZ(-6deg); }
+  50% { transform: translateX(5px)  rotateZ(6deg); }
+  100% { transform: translate(0, 0) rotateZ(0); filter: none; }
+}
+.dice-area.haunted .dice-value-badge {
+  color: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan);
+}
+
+/* ===== Haunting effects (fullscreen) ===== */
+.haunt-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 25%, oklch(0.05 0.04 300 / 0.92) 85%),
+    oklch(0.1 0.06 165 / 0.35);
+}
+.haunt-overlay.wait { animation: hauntDarkIn 1s ease-in forwards, hauntFlicker 0.35s steps(1) 0.3s 3; }
+.haunt-overlay.on   { animation: hauntDarkOut 2.2s ease-out forwards; }
+@keyframes hauntDarkIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hauntFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(2.2); } }
+@keyframes hauntDarkOut { 0%, 55% { opacity: 1; } 100% { opacity: 0; } }
+
+.haunt-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, oklch(0.97 0.08 165 / 0.95), oklch(0.85 0.17 165 / 0.4) 40%, transparent 70%);
+  opacity: 0;
+  animation: hauntFlash 0.6s ease-out 0.9s;
+}
+@keyframes hauntFlash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Shake via left/top (not transform) so no stacking context traps the dice below the overlay */
+.app.ghost-shake .board-wrap { animation: boardShake 0.45s linear 0.9s; }
+@keyframes boardShake {
+  0%, 100% { left: 0; top: 0; }
+  15% { left: -7px; top: 3px; }
+  30% { left: 6px;  top: -4px; }
+  45% { left: -5px; top: -2px; }
+  60% { left: 5px;  top: 4px; }
+  80% { left: -3px; top: 1px; }
+}
+
+/* The dice and its ghosts sit above the dark overlay */
+.dice-area.haunted, .dice-area.haunt-lift { position: relative; z-index: 95; }
+.dice-area.haunted .dice-stage {
+  animation: diceHaunt 2.2s ease-in-out;
+}
+
+/* Reverse haunting: three ghosts circle the die counter-clockwise */
+.dice-ghost.orbit {
+  font-size: 46px;
+  animation: ghostOrbit 2.2s linear forwards;
+}
+@keyframes ghostOrbit {
+  0%   { transform: translate(-50%, -50%) rotate(calc(var(--a) + 0deg))    translateX(54px)  rotate(calc(0deg - var(--a)));    opacity: 0; }
+  12%  { opacity: 1; }
+  50%  { transform: translate(-50%, -50%) rotate(calc(var(--a) - 360deg))  translateX(120px)  rotate(calc(360deg - var(--a)));  opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(calc(var(--a) - 720deg))  translateX(185px) rotate(calc(720deg - var(--a)));  opacity: 0; }
+}
+
+.dice-spark {
+  position: absolute;
+  top: 50%; left: 50%;
+  font-size: 22px;
+  pointer-events: none;
+  z-index: 11;
+  opacity: 0;
+  animation: sparkBurst 0.8s ease-out 0.9s forwards;
+}
+@keyframes sparkBurst {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(0.4); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(var(--a)) translateY(-90px) scale(1.2); }
+}
+
+/* ===== Settings popover ===== */
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.settings-wrap { position: relative; }
+.settings-btn {
+  background: var(--bg-1);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+.settings-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--bg-1);
+  border: 1px solid var(--neon-pink);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 16px 40px oklch(0 0 0 / 0.6), 0 0 24px oklch(0.75 0.19 55 / 0.2);
+  z-index: 120;
+}
+.settings-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--neon-pink);
+}
+.settings-reset { width: 100%; padding: 12px 16px; font-size: 14px; border-color: var(--neon-orange); color: var(--ink); }
+.settings-reset:hover { border-color: var(--neon-pink); }
+.settings-hint { margin-top: 10px; font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
